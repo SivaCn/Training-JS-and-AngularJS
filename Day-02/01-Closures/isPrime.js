@@ -65,14 +65,7 @@ var isOddOrEven = (function (){
     
 })();
 
-function memoize(algoFn){
-    var cache = {};
-    return function (n){
-        if (typeof cache[n] == 'undefined')
-            cache[n] = algoFn(n);
-        return cache[n];
-    } 
-}
+
 
 
 
