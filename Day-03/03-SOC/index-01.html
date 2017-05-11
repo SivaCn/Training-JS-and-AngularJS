@@ -19,6 +19,29 @@
 			font-weight: bold;
 		}
 	</style>
+	<script src="jquery-3.2.1.min.js"></script>
+	<script>
+		String.prototype.toInt = function(){
+			return parseInt(this, 10);
+		};
+
+		$(function(){
+			$('#btnCalculate').click(function(){
+				var basic = $('#txtBasic').val().toInt(),
+					hra = $('#txtHra').val().toInt(),
+					da = $('#txtDa').val().toInt(),
+					tax = $('#rangeTax').val().toInt();
+
+				var gross = basic + hra + da;
+				var net = gross * ((100-tax)/100);
+				$('#divResult').html(net);
+			});
+
+			$('#rangeTax').change(function(){
+				$('#spanTax').html(this.value);
+			});
+		});
+	</script>
 </head>
 <body>
 	<h1>Salary Calculator</h1>
@@ -26,15 +49,15 @@
 	<div class="content">
 		<div class="field">
 			<label for="">Basic :</label>
-			<input type="text" name="" id="txtBasic">
+			<input type="number" name="" id="txtBasic">
 		</div>
 		<div class="field">
 			<label for="">HRA :</label>
-			<input type="text" name="" id="txtHra">
+			<input type="number" name="" id="txtHra">
 		</div>
 		<div class="field">
 			<label for="">DA :</label>
-			<input type="text" name="" id="txtDa">
+			<input type="number" name="" id="txtDa">
 		</div>
 		<div class="field">
 			<label for="">Tax :</label>
