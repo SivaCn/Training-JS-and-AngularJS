@@ -50,17 +50,21 @@
 		});*/
 
 		angular
-			.module('ng')
+			.module('myApp', [])
+			.controller('salaryCalculatorController', function($scope){
+				console.log('@salaryCalculatorController id=', $scope.$id);
+				$scope.calculator = new SalaryCalculator();
+			})
 			.run(function($rootScope){
-				window.scope = $rootScope;
-				window.calculator = scope.calculator = new SalaryCalculator();
+				console.log('@run $rootScope.id=', $rootScope.$id);
+				$rootScope.appName = 'Salary Calculator';
 			})
 	</script>
 </head>
-<body ng-app>
-	<h1>Salary Calculator</h1>
+<body ng-app="myApp">
+	<h1 ng-bind="appName"></h1>
 	<hr>
-	<div class="content">
+	<div class="content" ng-controller="salaryCalculatorController">
 		<div class="field">
 			<label for="">Basic :</label>
 			<input type="number" name="" id="txtBasic" ng-model="calculator.basic">
