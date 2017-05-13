@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Custom Directives</title>
+	<script src="jquery-3.2.1.min.js"></script>
+	<script src="angular.js"></script>
+	<script>
+		angular
+			.module('myApp', [])
+			.directive('helloWorld', function(){
+				return function($scope, $element, $attr){
+					$element.on('click', function(){
+						$element.html($scope.clickMessage);
+					});
+					$scope.$watch('clickMessage', function(newValue, oldValue){
+						$element.html(newValue);
+					})
+
+				};
+			})
+			.controller('greetController', function($scope){
+				$scope.name = 'Default Name';
+
+				$scope.onMessageExpired = function(){
+					console.log('Message expired event triggered');
+				}
+			})
+			.directive('greeter', function(){
+				return {
+					restrict : 'E',
+					scope : {
+						subjectName : '=',
+						messageExpired : '&'
+					},
+					template : '<div><h1>Greeter</h1><input type="button" id="btnGreet" value="Greet" ng-click="onBtnGreetClick()"/><div id="greetMessage">{{greetMessage}}</div></h1></div>',
+					link : function($scope, $element, $attr){
+
+					},
+					controller : function($scope, $timeout){
+						console.log($scope);
+						$scope.onBtnGreetClick = function(){
+							console.log($scope);
+							$scope.greetMessage = 'Hi ' + $scope.subjectName + ', welcome to angular!';
+							$timeout(function() {
+								$scope.subjectName = '';
+								$scope.greetMessage = '';
+								$scope.messageExpired();
+							}, 5000);
+						};
+					}
+				}
+			})
+
+	</script>
+</head>
+<body ng-app="myApp" >
+	<div ng-controller="greetController">
+		<input type="text" name="" id="" ng-model="empname">
+		<hr>
+		<greeter subject-name="empname" message-expired="onMessageExpired()">This is where greeter will be displayed</greeter>
+	</div>
+	
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

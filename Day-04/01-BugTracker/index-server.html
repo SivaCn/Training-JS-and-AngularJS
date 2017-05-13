@@ -37,6 +37,28 @@
 		.datetime{
 			font-style: italic;
 		}
+		.rating{
+		  color: #a9a9a9;
+		  margin: 0;
+		  padding: 0;
+		}
+
+		ul.rating {
+		  display: inline-block;
+		}
+
+		.rating li {
+		  list-style-type: none;
+		  display: inline-block;
+		  padding: 1px;
+		  text-align: center;
+		  font-weight: bold;
+		  cursor: pointer;
+		}
+
+		.rating .filled {
+		  color: #21568b;
+		}
 	</style>
 	<script src="angular.js"></script>
 	<script src="moment.js"></script>
@@ -67,7 +89,7 @@
 					- length
 
 		10. Display 'createdAt' - done
-		11. Persist the bugs in the server
+		11. Persist the bugs in the server - done
 		12. Make the bugs accessible using unique urls
 	</script>
 	<script src="utils.js"></script>
@@ -99,7 +121,8 @@
 					id : bugId,
 					name : bugName || defaultBugName,
 					isClosed : false,
-					createdAt : new Date()
+					createdAt : new Date(),
+					severity : 1
 				};
 			};
 			this.toggle = function(bug){
@@ -178,6 +201,13 @@
 						return response.data;
 					});
 			}
+			function updateBug(bug){
+				return $http
+					.put(bugServiceUrl + bug.id, bug)
+					.then(function(response){
+						return response.data;
+					});
+			}
 			function removeBug(bug){
 				return $http
 					.delete(bugServiceUrl + bug.id, bug)
@@ -189,9 +219,10 @@
 				getAll : getAllBugs,
 				addNew : addNewBug,
 				toggle : toggleBug,
-				remove : removeBug
-			}
-		})
+				remove : removeBug,
+				update : updateBug
+			};
+		});
 
 		bugTrackerApp.controller('bugsController', function($scope, bugService){
 			
@@ -219,6 +250,11 @@
 				//
 			};
 
+			/*$scope.ratingChanged = function(bug, rating){
+				bug.severity = rating;
+				bugService
+					.update(bug);
+			}*/
 			
 			
 			
@@ -235,6 +271,54 @@
 			}
 		});
 
+		bugTrackerApp.directive('starRating', function (bugService) {
+			console.log(bugService);
+		    return {
+		      restrict: 'A',
+		      template: '<ul class="rating">' +
+		                  '<li ng-repeat="star in stars" ng-class="star" ng-click="toggle($index)">' +
+		                    '\u2605' +
+		                  '</li>' +
+		                '</ul>',
+		      scope: {
+		        ratingValue: '=',
+		        max: '=',
+		        bug : '=',
+		        readonly: '@',
+		        onRatingSelected: '&'
+		      },
+		      link: function (scope, elem, attrs) {
+
+		        var updateStars = function() {
+		          scope.stars = [];
+		          for (var  i = 0; i < scope.max; i++) {
+		            scope.stars.push({filled: i < scope.ratingValue});
+		          }
+		        };
+
+		        scope.toggle = function(index) {
+		          if (scope.readonly && scope.readonly === 'true') {
+		            return;
+		          }
+		          scope.ratingValue = index + 1;
+		          scope.bug.severity = scope.ratingValue;
+		          console.log(scope.bug);
+		          bugService
+		          	.update(scope.bug)
+		          	.then(function(){
+		          		scope.onRatingSelected({rating: index + 1});		
+		          	});
+		          
+		        };
+
+		        scope.$watch('ratingValue', function(oldVal, newVal) {
+		          if (newVal) {
+		            updateStars();
+		          }
+		        });
+		      }
+		    }
+		  });
 	</script>
 </head>
 <body ng-app="bugTrackerApp">
@@ -274,6 +358,7 @@
 						{{bug.name | trimText}}
 					</span>
 					<div class="datetime">{{ bug.createdAt | elapsed }}</div>
+					<div star-rating rating-value="bug.severity" bug="bug" max="5"></div>
 					<!-- <div class="datetime">{{ getBeautifulDate(bug.createdAt) }}</div> -->
 				</li>
 			</ol>
