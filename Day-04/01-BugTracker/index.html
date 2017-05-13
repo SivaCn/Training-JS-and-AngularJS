@@ -45,10 +45,25 @@
 		3. Toggle the 'closed' status of the bugs - done
 		4. Remove closed bugs - done
 		5. Display statistics (# of closed bugs / total # of bugs) - done
-		6. Search for the bugs
-		7. Sort the bugs
-		8. Improve the bug display
+		6. Search for the bugs - done
+		7. Sort the bugs - done
+		8. Improve the bug display - done
 		9. Persist the bugs in the localStorage (assignment)
+			window.localStorage
+			===================
+				* key/value store
+				* both key & value must be strings
+				* key has to be unique
+				* angular.toJson() and angular.fromJson() for searialization and deserialization
+				APIs
+				----
+					- setItem(key, value)
+					- getItem(key) //=> value
+					- removeItem(key)
+					- key(index) // => key at index
+					- clear()
+					- length
+
 		10. Display 'createdAt'
 		11. Persist the bugs in the server
 		12. Make the bugs accessible using unique urls
@@ -124,6 +139,15 @@
 			};
 		});
 
+		bugTrackerApp.value('defaultTrimLength', 30);
+
+		bugTrackerApp.filter('trimText', function(defaultTrimLength){
+			return function(data, trimLength){
+				trimLength = trimLength || defaultTrimLength;
+				return data.length < trimLength ? data : data.substr(0,trimLength) + '...';
+			};
+		});
+
 	</script>
 </head>
 <body ng-app="bugTrackerApp">
@@ -159,9 +183,9 @@
 		</section>
 		<section class="list">
 			<ol>
-				<li ng-repeat="bug in bugs | filter:searchBug | orderBy:sortBugBy:sortBugDescending ">
+				<li ng-repeat="bug in (bugs | filter:searchBug | orderBy:sortBugBy:sortBugDescending) ">
 					<span class="bugname" ng-click="toggle(bug)" ng-class="{closed : bug.isClosed}">
-						{{bug.name}}
+						{{bug.name | trimText}}
 					</span>
 					<div class="datetime">[Created At]</div>
 				</li>
